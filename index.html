@@ -40,7 +40,7 @@
   /* Header */
   header {
     width: 100%;
-    max-width: 640px;
+    max-width: 900px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -108,7 +108,7 @@
     border-radius: 20px;
     box-shadow: var(--sh-lg), inset 0 1px 0 #fff;
     width: 100%;
-    max-width: 640px;
+    max-width: 900px;
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -341,7 +341,7 @@ function initGrid(keep) {
   const prev = keep ? grid.map(r=>[...r]) : null;
   const isDesktop = window.innerWidth > 600;
   const maxPx = isDesktop
-    ? Math.min(window.innerWidth - 48, 600) * 1.5
+    ? Math.min(window.innerWidth - 48, 900)
     : Math.min(window.innerWidth - 48, 600);
   cellSize = Math.floor(maxPx / gridSize);
   const cv = document.getElementById('pixel-canvas');
