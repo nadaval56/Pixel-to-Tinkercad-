@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pixel to Tinkercad</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #eef1f6;
+    --surface:  #ffffff;
+    --ink:      #1a2744;
+    --accent:   #2563eb;
+    --accent-h: #1d4ed8;
+    --danger:   #dc2626;
+    --muted:    #94a3b8;
+    --border:   rgba(0,0,0,.07);
+    --sh-sm:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --sh-md:    0 4px 14px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
+    --sh-lg:    0 8px 32px rgba(0,0,0,.12), 0 3px 10px rgba(0,0,0,.07);
+    --sh-in:    inset 0 2px 8px rgba(0,0,0,.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(37,99,235,.06) 0%, transparent 50%),
+      radial-gradient(circle at 85% 90%, rgba(37,99,235,.04) 0%, transparent 50%);
+    color: var(--ink);
+    font-family: 'Heebo', sans-serif;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 32px;
+    gap: 16px;
+  }
+
+  /* Header */
+  header {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .brand-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -.3px;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  /* Timer */
+  #timer-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--sh-sm), inset 0 1px 0 #fff;
+    padding: 10px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: box-shadow .15s, transform .1s;
+    user-select: none;
+    min-width: 120px;
+    justify-content: center;
+  }
+  #timer-btn:hover { box-shadow: var(--sh-md), inset 0 1px 0 #fff; transform: translateY(-1px); }
+  #timer-btn:active { transform: none; box-shadow: var(--sh-sm); }
+  #timer-btn.running {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-color: transparent;
+    box-shadow: 0 4px 16px rgba(37,99,235,.35), inset 0 1px 0 rgba(255,255,255,.15);
+  }
+  #timer-btn.done {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    border-color: transparent;
+    box-shadow: 0 4px 16px rgba(220,38,38,.35), inset 0 1px 0 rgba(255,255,255,.15);
+    animation: glow .9s ease-in-out infinite alternate;
+  }
+  @keyframes glow {
+    to { box-shadow: 0 4px 28px rgba(220,38,38,.6), inset 0 1px 0 rgba(255,255,255,.15); }
+  }
+  .timer-icon { font-size: 15px; }
+  #timer-display {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: var(--ink);
+  }
+  #timer-btn.running #timer-display,
+  #timer-btn.done    #timer-display { color: #fff; }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--sh-lg), inset 0 1px 0 #fff;
+    width: 100%;
+    max-width: 640px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .tool-group {
+    display: flex;
+    gap: 5px;
+    background: var(--bg);
+    border-radius: 11px;
+    padding: 4px;
+    box-shadow: var(--sh-in);
+  }
+  .tool-btn {
+    font-family: 'Heebo', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all .15s;
+    background: transparent;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tool-btn:hover { color: var(--ink); }
+  .tool-btn.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--sh-sm), inset 0 1px 0 #fff;
+  }
+
+  .action-group { display: flex; gap: 8px; }
+  .btn {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: none; }
+  .btn-export {
+    background: linear-gradient(135deg, var(--accent), var(--accent-h));
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(37,99,235,.30), inset 0 1px 0 rgba(255,255,255,.15);
+  }
+  .btn-export:hover { box-shadow: 0 5px 18px rgba(37,99,235,.40), inset 0 1px 0 rgba(255,255,255,.15); }
+  .btn-clear {
+    background: var(--bg);
+    color: var(--muted);
+    box-shadow: var(--sh-sm), inset 0 1px 0 #fff;
+    border: 1px solid var(--border);
+  }
+  .btn-clear:hover { color: var(--danger); border-color: rgba(220,38,38,.25); }
+
+  /* Grid size pills */
+  .grid-sizes { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+  .size-pill {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .2px;
+  }
+  .size-pill:hover { color: var(--ink); border-color: var(--accent); }
+  .size-pill.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(37,99,235,.28);
+  }
+
+  /* Canvas */
+  #pixel-canvas {
+    display: block;
+    border-radius: 10px;
+    cursor: crosshair;
+    box-shadow: var(--sh-in), 0 0 0 1.5px rgba(0,0,0,.06);
+    touch-action: none;
+    max-width: 100%;
+    image-rendering: pixelated;
+  }
+
+  /* Steps */
+  .steps {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 500px) { .steps { grid-template-columns: repeat(2,1fr); } }
+
+  .step {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    box-shadow: var(--sh-in);
+  }
+  .step-num {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(37,99,235,.1);
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text { font-size: 11px; color: var(--ink); line-height: 1.5; }
+  .step-text strong { display: block; font-weight: 700; font-size: 12px; margin-bottom: 1px; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 12px 22px;
+    border-radius: 12px;
+    box-shadow: var(--sh-lg);
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+    z-index: 100;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand-title">Pixel to Tinkercad</div>
+    <div class="brand-sub">סרטטו · הורידו SVG · הדפיסו בתלת-מימד</div>
+  </div>
+  <div id="timer-btn" onclick="toggleTimer()">
+    <span class="timer-icon">⏱</span>
+    <span id="timer-display">05:00</span>
+  </div>
+</header>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="tool-group">
+      <button class="tool-btn active" id="tool-draw"  onclick="setTool('draw')">✏️ עיפרון</button>
+      <button class="tool-btn"        id="tool-erase" onclick="setTool('erase')">⬜ מחק</button>
+    </div>
+    <div class="action-group">
+      <button class="btn btn-clear"  onclick="clearGrid()">🗑</button>
+      <button class="btn btn-export" onclick="exportSVG()">הורד SVG ⬇</button>
+    </div>
+  </div>
+
+  <div class="grid-sizes">
+    <button class="size-pill"        onclick="resizeGrid(8)">8 × 8</button>
+    <button class="size-pill active" onclick="resizeGrid(16)">16 × 16</button>
+    <button class="size-pill"        onclick="resizeGrid(24)">24 × 24</button>
+    <button class="size-pill"        onclick="resizeGrid(32)">32 × 32</button>
+  </div>
+
+  <canvas id="pixel-canvas"></canvas>
+</div>
+
+<div class="card" style="padding:14px 18px;">
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text"><strong>סרטטו</strong>לחצו על התאים</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text"><strong>הורידו</strong>לחצו "הורד SVG"</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text"><strong>ייבאו</strong>Tinkercad: Import</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text"><strong>הדפיסו</strong>גוף תלת-מימדי מוכן!</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let gridSize = 16, cellSize = 28;
+let grid = [], currentTool = 'draw', isDrawing = false;
+let timerSecs = 300, timerRunning = false, timerInterval = null;
+
+function initGrid(keep) {
+  const prev = keep ? grid.map(r=>[...r]) : null;
+  const maxPx = Math.min(window.innerWidth - 48, 600);
+  cellSize = Math.floor(maxPx / gridSize);
+  const cv = document.getElementById('pixel-canvas');
+  cv.width = cv.height = gridSize * cellSize;
+  grid = Array.from({length:gridSize}, (_,r) =>
+    Array.from({length:gridSize}, (_,c) => prev && r < prev.length && c < prev[0].length ? prev[r][c] : false)
+  );
+  render();
+}
+
+function render() {
+  const cv = document.getElementById('pixel-canvas');
+  const ctx = cv.getContext('2d');
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const x = c*cellSize, y = r*cellSize;
+      ctx.fillStyle = (r+c)%2===0 ? '#f4f6fa' : '#eef1f6';
+      ctx.fillRect(x, y, cellSize, cellSize);
+      if (grid[r][c]) {
+        ctx.fillStyle = '#1a2744';
+        ctx.fillRect(x+1, y+1, cellSize-2, cellSize-2);
+        ctx.fillStyle = 'rgba(255,255,255,.07)';
+        ctx.fillRect(x+2, y+2, cellSize-4, Math.floor(cellSize*.3));
+      }
+      ctx.strokeStyle = 'rgba(0,0,0,.05)';
+      ctx.lineWidth = .5;
+      ctx.strokeRect(x+.5, y+.5, cellSize-1, cellSize-1);
+    }
+  }
+}
+
+function getCell(e) {
+  const cv = document.getElementById('pixel-canvas');
+  const rect = cv.getBoundingClientRect();
+  const sx = cv.width/rect.width, sy = cv.height/rect.height;
+  const src = e.touches ? e.touches[0] : e;
+  return [Math.floor((src.clientY-rect.top)*sy/cellSize), Math.floor((src.clientX-rect.left)*sx/cellSize)];
+}
+
+function paint(e) {
+  const [r,c] = getCell(e);
+  if (r<0||r>=gridSize||c<0||c>=gridSize) return;
+  const v = currentTool==='draw';
+  if (grid[r][c]===v) return;
+  grid[r][c]=v; render();
+}
+
+const cv = document.getElementById('pixel-canvas');
+cv.addEventListener('mousedown',  e=>{isDrawing=true; paint(e);});
+cv.addEventListener('mousemove',  e=>{if(isDrawing) paint(e);});
+cv.addEventListener('mouseup',    ()=>isDrawing=false);
+cv.addEventListener('mouseleave', ()=>isDrawing=false);
+cv.addEventListener('touchstart', e=>{e.preventDefault(); isDrawing=true; paint(e);},{passive:false});
+cv.addEventListener('touchmove',  e=>{e.preventDefault(); if(isDrawing) paint(e);},{passive:false});
+cv.addEventListener('touchend',   ()=>isDrawing=false);
+
+function setTool(t) {
+  currentTool=t;
+  ['draw','erase'].forEach(id=>document.getElementById('tool-'+id).classList.toggle('active',id===t));
+  cv.style.cursor = t==='erase' ? 'cell' : 'crosshair';
+}
+
+function resizeGrid(n) {
+  gridSize=n;
+  document.querySelectorAll('.size-pill').forEach(b=>b.classList.toggle('active',b.textContent.trim()===`${n} × ${n}`));
+  initGrid(false);
+}
+
+function clearGrid() {
+  grid=Array.from({length:gridSize},()=>Array(gridSize).fill(false)); render();
+}
+
+function exportSVG() {
+  const mm=2, total=gridSize*mm;
+  const rects=[];
+  for(let r=0;r<gridSize;r++) for(let c=0;c<gridSize;c++)
+    if(grid[r][c]) rects.push(`  <rect x="${c*mm}" y="${r*mm}" width="${mm}" height="${mm}"/>`);
+  if(!rects.length){showToast('⚠️ שרטטו משהו קודם!'); return;}
+  const svg=`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${total}mm" height="${total}mm" viewBox="0 0 ${total} ${total}">\n  <g fill="#000000">\n${rects.join('\n')}\n  </g>\n</svg>`;
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'})),download:`pixel-${gridSize}x${gridSize}.svg`});
+  a.click(); URL.revokeObjectURL(a.href);
+  showToast('✅ SVG הורד — Import → SVG ב-Tinkercad');
+}
+
+function toggleTimer() {
+  const btn=document.getElementById('timer-btn');
+  if(timerRunning){clearInterval(timerInterval); timerRunning=false; btn.className=''; return;}
+  if(timerSecs<=0) timerSecs=300;
+  timerRunning=true; btn.className='running';
+  timerInterval=setInterval(()=>{
+    timerSecs--; updateTimerDisplay();
+    if(timerSecs<=0){clearInterval(timerInterval); timerRunning=false; btn.className='done'; showToast('🔔 ההפוגה הסתיימה — חוזרים לעבודה!');}
+  },1000);
+}
+
+function updateTimerDisplay() {
+  const m=String(Math.floor(timerSecs/60)).padStart(2,'0'), s=String(timerSecs%60).padStart(2,'0');
+  document.getElementById('timer-display').textContent=`${m}:${s}`;
+}
+
+let toastT;
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+window.addEventListener('resize',()=>initGrid(true));
+initGrid(false);
+</script>
+</body>
+</html>
